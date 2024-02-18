@@ -26,7 +26,7 @@ void* ret;
 	return ret;
 }
 
-static void __gaa_helpsingle(char short_name, char *name, 
+static void __gaa_helpsingle(char short_name, char *name,
 	char *arg_desc, char *opt_help)
 {
      int col1, col3, col4, tabsize = 3, curr;
@@ -246,9 +246,9 @@ extern "C"
     int gaa(int argc, char *argv[], gaainfo *gaaval);
 
     void gaa_help(void);
-    
+
     int gaa_file(const char *name, gaainfo *gaaval);
-    
+
 #ifdef __cplusplus
 }
 #endif
@@ -365,7 +365,7 @@ if(gaa_error == 1)                       \
 {                                        \
     gaa_error = 0;                       \
     return GAA_ERROR_INVALID_ARG;        \
-} 
+}
 
 
 
@@ -443,12 +443,12 @@ if(k == 0)                                                            \
         printf("You must give at least one option of '%s'\n", str);          \
     return 0;         \
 }
-        
+
 #define GAA_INCOMP(str)                                                \
 k = 0;                                                              \
 for(i = 0; i < strlen(str); i++)                                    \
 {                                                                   \
-    j = gaa_get_option_num(str + i, GAA_LETTER_OPTION);           \
+    j = gaa_get_option_num(&str[i], GAA_LETTER_OPTION);           \
     if(j == GAA_ERROR_NOMATCH)                                      \
     {                                                               \
         printf("Error: invalid 'obligat' set\n");                  \
@@ -462,7 +462,7 @@ if(k > 1)                                                            \
     printf("The options '%s' are incompatible\n", str);              \
     return 0;                                                          \
 }
-        
+
 
 static char **GAAargv;
 static int GAAargc;
@@ -509,67 +509,67 @@ static float gaa_getfloat(char *arg)
 }
 /* option structures */
 
-struct GAAOPTION_key 
+struct GAAOPTION_key
 {
 	char** arg1;
 	int size1;
 };
 
-struct GAAOPTION_hash 
+struct GAAOPTION_hash
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_modes_directory 
+struct GAAOPTION_modes_directory
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_mode 
+struct GAAOPTION_mode
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_algorithms_directory 
+struct GAAOPTION_algorithms_directory
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_algorithm 
+struct GAAOPTION_algorithm
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_config 
+struct GAAOPTION_config
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_keyfile 
+struct GAAOPTION_keyfile
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_keymode 
+struct GAAOPTION_keymode
 {
 	char* arg1;
 	int size1;
 };
 
-struct GAAOPTION_keysize 
+struct GAAOPTION_keysize
 {
 	int arg1;
 	int size1;
 };
 
-struct GAAOPTION_openpgp_z 
+struct GAAOPTION_openpgp_z
 {
 	int arg1;
 	int size1;
@@ -581,7 +581,7 @@ struct GAAREST
 	char** arg1;
 	int size1;
 };
-         
+
 #line 349 "gaa.skel"
 static int gaa_is_an_argument(char *str)
 {
@@ -693,6 +693,13 @@ static int gaa_get_option_num(char *str, int status)
     return GAA_ERROR_NOMATCH;
 }
 
+void mcrypt_license(void);
+void mcrypt_version(void);
+void usage(void);
+int print_list(void);
+int print_keylist(void);
+int print_hashlist(void);
+
 static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 {
     int OK = 0;
@@ -715,7 +722,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
 #endif
 
     opt_list[gaa_num] = 1;
-    
+
     for(gaa_last_non_option = gaa_index;
         (gaa_last_non_option != GAAargc) && (gaa_is_an_argument(GAAargv[gaa_last_non_option]) == GAA_NOT_AN_OPTION);
         gaa_last_non_option++);
@@ -725,7 +732,7 @@ static int gaa_try(int gaa_num, int gaa_index, gaainfo *gaaval, char *opt_list)
         gaa_index = 1;
         gaa_last_non_option = GAAargc;
     }
-    
+
     switch(gaa_num)
     {
 	case GAAOPTID_license:
@@ -1169,7 +1176,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
         newline = 1;
         len = 2;
     }
-    
+
     a = fgetc( file);
     if (a == EOF) return 0;
 
@@ -1226,7 +1233,7 @@ static int gaa_internal_get_next_str(FILE *file, gaa_str_node *tmp_str, int argc
 
     fseek(file,- 1, SEEK_CUR);
 /*    printf("%d\n", ftell(file)); */
-    
+
     return -1;
 }
 
@@ -1239,13 +1246,13 @@ int gaa_file(const char *name, gaainfo *gaaval)
     FILE *file;
 
     gaa_processing_file = 1;
-    
+
     if((file = fopen(name, "r")) == NULL)
     {
         printf("Couldn't open '%s' configuration file for reading\n", name);
         return 1;
     }
-    
+
     tmp_str = &first_str;
     do
     {
@@ -1259,10 +1266,10 @@ int gaa_file(const char *name, gaainfo *gaaval)
         tmp_str = &((*tmp_str)->next);
     }
     while(rval == -1);
-    
+
     if(rval == 1)
         return 0;
-    
+
     argv = gaa_malloc((1 + argc) * sizeof(char*));
 
     tmp_str2 = first_str;

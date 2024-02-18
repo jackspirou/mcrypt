@@ -10,9 +10,9 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *                               
+ *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include <defines.h>
@@ -23,7 +23,6 @@
 #include <zlib.h>
 #endif
 #include <stdio.h>
-#include <malloc.h>
 
 #include "xmalloc.h"
 #include "keys.h"
@@ -71,7 +70,7 @@ static USTRING
 make_ustring(const uchar *buffer, size_t length)
 {
     USTRING a;
-    
+
     a = _mcrypt_calloc(1, sizeof *a + length);
     a->len = length;
     a->d = (void*)a + sizeof *a;
@@ -86,7 +85,7 @@ realloc_ustring(const USTRING src, size_t length)
 {
     USTRING a;
     size_t len;
-    
+
     len = length;
     if (src != NULL)
 	len += src->len;
@@ -113,7 +112,7 @@ file_to_buf(const char *file, off_t offset, size_t *ret_len )
     if (stat(file, &statbuf) == -1 ||
 	statbuf.st_size == 0)
         return NULL;
-    
+
     len = statbuf.st_size;
     fp = fopen(file, "rb");
     if (fp == NULL)
@@ -148,7 +147,7 @@ _mcrypt_encrypt(MCRYPT hd, uchar *out, size_t outlen,
     if (outlen < inlen)
         return -1;
     memcpy(out, in, inlen);
-    mcrypt_generic(hd, out, inlen);    
+    mcrypt_generic(hd, out, inlen);
     return 0;
 }
 
@@ -161,7 +160,7 @@ _mcrypt_decrypt(MCRYPT hd, uchar *out, size_t outlen,
     if (outlen < inlen)
         return -1;
     memcpy(out, in, inlen);
-    mdecrypt_generic(hd, out, inlen);        
+    mdecrypt_generic(hd, out, inlen);
     return 0;
 }
 
@@ -170,7 +169,7 @@ static char*
 _mhash_keymode2str(keygenid ki, hashid hi)
 {
     static char ret[512];
-    
+
     ret[0] = 0;
     if (ki == KEYGEN_S2K_SIMPLE)
         strcat(ret, "s2k-simple-");
@@ -178,7 +177,7 @@ _mhash_keymode2str(keygenid ki, hashid hi)
         strcat(ret, "s2k-salted-");
     else if (ki == KEYGEN_S2K_ISALTED)
         strcat(ret, "s2k-isalted-");
-          
+
     if (hi == MHASH_SHA1)
         strcat(ret, "sha1");
     else if (hi == MHASH_MD5)
@@ -186,7 +185,7 @@ _mhash_keymode2str(keygenid ki, hashid hi)
     else if (hi == MHASH_RIPEMD160)
         strcat(ret, "ripemd");
     else if (hi == MHASH_SHA256)
-	strcat(ret, "sha256");                
+	strcat(ret, "sha256");
     return ret;
 }
 
@@ -198,7 +197,7 @@ _mhash_keygen(uchar algid)
     case OPENPGP_S2K_SIMPLE: return KEYGEN_S2K_SIMPLE;
     case OPENPGP_S2K_SALTED: return KEYGEN_S2K_SALTED;
     case OPENPGP_S2K_ISALTED: return KEYGEN_S2K_ISALTED;
-    }    
+    }
     return KEYGEN_S2K_ISALTED; /* return default keygen mode. */
 }
 
@@ -240,35 +239,35 @@ static char*
 _mcrypt_algid_to_algo(uchar algid)
 {
     switch (algid) {
-    case OPENPGP_ENC_3DES: 
+    case OPENPGP_ENC_3DES:
 	keysize = 24;
 	return "tripledes";
-        
-    case OPENPGP_ENC_CAST5: 
+
+    case OPENPGP_ENC_CAST5:
 	keysize = 16;
 	return "cast-128";
-        
-    case OPENPGP_ENC_BLOWFISH: 
+
+    case OPENPGP_ENC_BLOWFISH:
 	keysize = 16;
 	return "blowfish";
-        
-    case OPENPGP_ENC_AES128: 
+
+    case OPENPGP_ENC_AES128:
 	keysize = 16;
 	return "rijndael-128";
-	
-    case OPENPGP_ENC_AES192: 
+
+    case OPENPGP_ENC_AES192:
 	keysize = 24;
 	return "rijndael-128";
-        
-    case OPENPGP_ENC_AES256: 
+
+    case OPENPGP_ENC_AES256:
 	keysize = 32;
 	return "rijndael-128";
-        
-    case OPENPGP_ENC_TWOFISH: 
+
+    case OPENPGP_ENC_TWOFISH:
 	keysize = 32;
 	return "twofish";
     }
-    
+
     /* default cipher is CAST5. */
     keysize = 16;
     return "cast-128";
@@ -323,13 +322,13 @@ static uint32
 get_pkt_tag(const uchar *buf, PACKET *pkt)
 {
     uint32 tag = -1;
-    
+
     assert(buf);
     if (!(buf[0] & 0x80))
         return -1; /* invalid */
     if (buf[0] & 0x40) { /* new style */
         tag = buf[0] & 0x3f;
-        if (pkt) 
+        if (pkt)
 	    pkt->old = 0;
     }
     else { /* old style */
@@ -356,7 +355,7 @@ length_len(const uint32 len, PACKET *pkt)
         else if (len < 0xffffffff)
             ret = 4;
     }
-    else {    
+    else {
         if (len < 192)
             ret = 1;
         else if (len < 8384)
@@ -372,13 +371,13 @@ static void
 length_encode(uint32 len, uchar *lenbuf, uchar *lensize)
 {
     assert(len > 0);
-    
+
     if (len < 192) {
         lenbuf[0] = len;
 	*lensize = 1;
     }
     else if (len < 8384) {
-        len -= 192;        
+        len -= 192;
         lenbuf[0] = len / 256 + 192;
         lenbuf[1] = len % 256;
 	*lensize = 2;
@@ -398,7 +397,7 @@ static uint32
 length_decode(const uchar *buf, int pos, PACKET *pkt)
 {
     uint32 len = 0;
-    
+
     assert (buf != NULL);
     assert (pos >= 0);
 
@@ -416,9 +415,9 @@ length_decode(const uchar *buf, int pos, PACKET *pkt)
     }
     else {
         len = 1 << (buf[pos]);
-        if (pkt) 
+        if (pkt)
 	    pkt->blockmode = 1;
-    }   
+    }
     return len;
 }
 
@@ -505,10 +504,10 @@ plaintext_encode(const USTRING dat)
     length_encode(dat->len + 6, lenbuf, &lensize);
     memcpy(result->d + pos, lenbuf, lensize);
     pos += lensize;
-    
+
     t = time(NULL); /* time of creation. */
     result->d[pos++] = 0x62; /* binary */
-    result->d[pos++] = 0; /* no file name */    
+    result->d[pos++] = 0; /* no file name */
     result->d[pos++] = t >> 24;
     result->d[pos++] = t >> 16;
     result->d[pos++] = t >>  8;
@@ -554,7 +553,7 @@ dek_load(DEK *d, char *pass)
     KEYGEN keygen_data;
     char* mode = DEFAULT_PGP_MODE;
     int ret;
-    
+
     d->keylen = pgp_get_keysize(d->algo);
     keygen_data.hash_algorithm[0] = d->s2k.algo;
     keygen_data.count = d->s2k.count;
@@ -562,8 +561,8 @@ dek_load(DEK *d, char *pass)
     keygen_data.salt_size = 8;
 
     d->blocklen = mcrypt_module_get_algo_block_size(d->algo, NULL);
-    ret = mhash_keygen_ext(d->s2k.mode, keygen_data, d->key, 
-			   DIM (d->key), pass, strlen(pass));
+    ret = mhash_keygen_ext(d->s2k.mode, keygen_data, d->key,
+			   DIM (d->key), (uint8_t *) pass, strlen(pass));
     if (ret < 0)
     	err_quit(_("mhash_keygen_ext() failed.\n"));
     d->hd = mcrypt_module_open(d->algo, NULL, mode, NULL);
@@ -581,28 +580,28 @@ dek_create(char* algo, char *pass)
     keygenid mh_keymode;
     hashid mh_alg;
     int ret;
-    
+
     d = _mcrypt_calloc(1, sizeof *d);
     d->algo = algo;
     d->keylen = pgp_get_keysize(algo);
     d->blocklen = mcrypt_module_get_algo_block_size(algo, NULL);
-    
+
     algorithm = d->algo;
     keysize = d->keylen;
-    
+
     /* There are two ways for symmetric encryption.
        1. To derrive the session key directly from the passphrase
        2. Use a random session key and it encrypt it with a derrived
          key from the passphrase.
-       For the sake of simplicity, we always use method 1. */    
+       For the sake of simplicity, we always use method 1. */
     if (_mcrypt_pgp_conv_keymode(keymode, &mh_keymode, &mh_alg) < 0) {
         char tmp[255];
-	
+
         snprintf(tmp, DIM (tmp)-1, _("OpenPGP: Unsupported key mode %s\n"),
                   keymode);
     	err_quit(tmp);
     }
-    
+
     d->s2k.mode = mh_keymode;
     d->s2k.algo = mh_alg;
     d->s2k.count = S2K_DEFAULT_COUNT;
@@ -614,7 +613,7 @@ dek_create(char* algo, char *pass)
 
     mcrypt_randomize(d->s2k.salt, 8, 0);
     ret = mhash_keygen_ext(mh_keymode, keygen_data, d->key,
-			   DIM (d->key), pass, strlen(pass));
+			   DIM (d->key), (uint8_t *) pass, strlen(pass));
     if (ret < 0)
     	err_quit(_("mhash_keygen_ext() failed.\n"));
     d->hd = mcrypt_module_open(algo, NULL, mode, NULL);
@@ -631,15 +630,15 @@ symkey_enc_decode(const USTRING dat, DEK **ret_dek)
     int tag = 0, headlen = 0, offset = 0;
 
     assert(dat->len > 0);
-    
-    header_decode(dat->d, &tag, &headlen, &offset, NULL);
+
+    header_decode(dat->d, (uint32_t *) &tag, (uint32_t *) &headlen, (uint32_t *) &offset, NULL);
     if (tag != PKT_SYMKEY_ENC)
         return PGP_ERR_PKT;
     if (headlen < 3)
         return PGP_ERR_PKT;
     if (dat->d[offset++] != 4)
         return PGP_ERR_PKT; /* invalid version */
-    
+
     d = _mcrypt_calloc(1,  sizeof *d);
     d->algo = _mcrypt_algid_to_algo(dat->d[offset++]);
     d->s2k.mode = _mhash_keygen(dat->d[offset++]);
@@ -740,10 +739,10 @@ encrypted_decode(const DEK *dek, const USTRING dat, USTRING *result)
     USTRING t = NULL, p = NULL;
 
     memset(&pkt, 0, sizeof(pkt));
-    
+
     assert(dat->len > 0);
     header_decode(dat->d, &tag, &headlen, &offset, &pkt);
-    
+
     if (tag != PKT_ENCRYPTED)
         return PGP_ERR_PKT;
     if (dat->len < dek->blocklen + 3)
@@ -812,7 +811,7 @@ encrypted_encode(const USTRING pt, const DEK *dek)
 
     ct = make_ustring( rndpref,   2 * pt->len); /* xxx */
     pos = dek->blocklen + 2;
-    
+
     _mcrypt_encrypt(dek->hd, ct->d + pos, pt->len, pt->d, pt->len);
     ct->len = (pos += pt->len);
     pos = 0;
@@ -822,12 +821,12 @@ encrypted_encode(const USTRING pt, const DEK *dek)
     length_encode(ct->len, lenbuf, &lensize);
     memcpy(result->d + pos, lenbuf, lensize);
     pos += lensize;
-    
+
     memcpy(result->d + pos, ct->d, ct->len);
     result->len = ct->len + pos;
     free(ct);
-    
-    return result; 
+
+    return result;
 }
 
 
@@ -841,14 +840,14 @@ do_compress(int algo, int flush, uchar *inbuf, size_t insize,
     int zrc = 0;
     z_stream *zs = NULL;
     USTRING out = NULL;
-    
+
     zs = _mcrypt_calloc( 1,  sizeof *zs );
     zrc = (algo == 1)? deflateInit2(zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
 				    -13, openpgp_z, Z_DEFAULT_STRATEGY):
     deflateInit(zs, Z_DEFAULT_COMPRESSION);
     if (zrc)
         goto leave;
-    
+
     zs->next_in = inbuf;
     zs->avail_in = insize;
 
@@ -871,15 +870,15 @@ do_compress(int algo, int flush, uchar *inbuf, size_t insize,
             out = realloc_ustring( out, len );
             memcpy( out->d + pos, buf, len );
             pos += len;
-        }        
-        
+        }
+
         if ( zrc ) {
             if ( zs->msg )
                 fprintf( stderr, _("zlib error `%s'.\n"), zs->msg );
             fprintf( stderr, _("compress: deflate returned %d.\n"), zrc );
-        }            
+        }
     } while ( zs->avail_out == 0 );
-    
+
 leave:
     *ret_out = out;
     free( zs );
@@ -929,7 +928,7 @@ do_uncompress( int algo, uchar *inbuf, size_t insize, USTRING *ret_out )
     uchar buf[4096];
     int pos = 0, len = 0;
     int zrc = 0;
-    
+
     zs = _mcrypt_calloc( 1,  sizeof *zs );
     zrc = ( algo == 1 )? inflateInit2( zs, -13 ) : inflateInit( zs );
     if ( zrc )
@@ -961,7 +960,7 @@ do_uncompress( int algo, uchar *inbuf, size_t insize, USTRING *ret_out )
             out->len = (pos += len);
             /*fprintf( stderr, "DBG: ok len=%d pos=%d\n", len, pos );*/
         }
-        if ( zrc ) {            
+        if ( zrc ) {
             if ( zs->msg )
                 fprintf( stderr, _("zlib error `%s'.\n"), zs->msg );
             fprintf( stderr, _("uncompress: inflate returned %d.\n"), zrc );
@@ -1000,7 +999,7 @@ compressed_decode( const USTRING zip, USTRING *result )
     rc = do_uncompress( zip->d[offset], zip->d + offset + 1,
                         zip->len - offset - 1, &t );
     *result = t;
-    
+
     return rc;
 #else
     return 0;
@@ -1017,7 +1016,7 @@ pgp_encrypt_file(const char *infile, const char *outfile, char *pass)
     uchar *buf = NULL, tmp[16*1024];
     size_t len = 0, nread = 0;
     int tag=0;
-    
+
     if (!infile || *infile == '-') {
         while (!feof(stdin)) {
             nread = fread(tmp, 1, DIM (tmp), stdin);
@@ -1047,7 +1046,7 @@ pgp_encrypt_file(const char *infile, const char *outfile, char *pass)
     fwrite(sym->d, 1, sym->len, fp);
     free(sym);
     total_bytes += t->len; /* increase input bytes */
-    
+
     pt = plaintext_encode(t);
     free(t);
 #ifdef HAVE_LIBZ
@@ -1135,7 +1134,7 @@ pgp_decrypt_file(const char *infile, const char *outfile, char *pass)
 	    }
             flen = 0; /* automatic EOF */
             break;
-                
+
         default:
             /*fprintf(stderr, "tag=%d\n", tag);*/
 	    free (buf);
@@ -1160,7 +1159,7 @@ pgp_decrypt_file(const char *infile, const char *outfile, char *pass)
     }
     else
 	pt = dat;
-    
+
     if (get_pkt_tag(pt->d, NULL) != PKT_PLAINTEXT) {
 	err_warn(_("Unsupported OpenPGP packet!\n"));
 	free (pt);
@@ -1188,4 +1187,3 @@ pgp_decrypt_file(const char *infile, const char *outfile, char *pass)
 	fflush (fp);
     return 0;
 }
-
