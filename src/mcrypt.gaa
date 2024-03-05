@@ -2,6 +2,9 @@
 
 #include <defines.h>
 
+void mcrypt_version();
+void mcrypt_license();
+
 #}
 
 GETTEXT_STRINGS

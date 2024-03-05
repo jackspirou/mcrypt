@@ -52,13 +52,13 @@
 #ifdef HAVE_LOCALE_H
 # include <locale.h>
 #endif
-  
+
 
 #include <gettext.h>
 #ifdef ENABLE_NLS
-# define _(String) gettext (String) 
+# define _(String) gettext (String)
 #else
-# define _(String) (String) 
+# define _(String) (String)
 #endif
 
 #ifdef HAVE_UTIME_H
@@ -139,13 +139,13 @@
  typedef unsigned int word16;
 #elif SIZEOF_UNSIGNED_SHORT_INT == 2
  typedef unsigned short word16;
-#else 
+#else
  typedef unsigned short int word16; /* default */
  typedef signed short int sword16;
 #endif
 
 #if SIZEOF_UNSIGNED_CHAR == 1
- typedef unsigned char byte; 
+ typedef unsigned char byte;
 #else
  typedef unsigned char byte;
 #endif
@@ -164,7 +164,7 @@
 #endif
 
 /*extern char *getpass();*/
-extern char *crypt(); /* libufc */
+extern char *crypt(const char *, const char *); /* libufc */
 
 #if HAVE_TERMIOS_H
 # include <termios.h>
@@ -192,4 +192,3 @@ extern char *crypt(); /* libufc */
 #endif
 
 #endif /* IDEFINES_H */
-
